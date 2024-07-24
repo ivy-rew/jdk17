@@ -718,15 +718,16 @@ public class ObjectStreamClass implements Serializable {
                         "cannot bind non-enum descriptor to an enum class");
             }
 
-            if (model.serializable == osc.serializable &&
-                    !cl.isArray() && !cl.isRecord() &&
-                    suid != osc.getSerialVersionUID()) {
-                throw new InvalidClassException(osc.name,
-                        "local class incompatible: " +
-                                "stream classdesc serialVersionUID = " + suid +
-                                ", local class serialVersionUID = " +
-                                osc.getSerialVersionUID());
-            }
+            // Hacked by cst@axonivy.com to not throw exception if serialVersionUID does not match!
+            // if (model.serializable == osc.serializable &&
+            //         !cl.isArray() && !cl.isRecord() &&
+            //         suid != osc.getSerialVersionUID()) {
+            //     throw new InvalidClassException(osc.name,
+            //             "local class incompatible: " +
+            //                     "stream classdesc serialVersionUID = " + suid +
+            //                     ", local class serialVersionUID = " +
+            //                     osc.getSerialVersionUID());
+            // }
 
             if (!classNamesEqual(model.name, osc.name)) {
                 throw new InvalidClassException(osc.name,
@@ -2218,13 +2219,14 @@ public class ObjectStreamClass implements Serializable {
                             !types[i - numPrimFields].isInstance(val))
                         {
                             Field f = fields[i].getField();
-                            throw new ClassCastException(
-                                "cannot assign instance of " +
-                                val.getClass().getName() + " to field " +
-                                f.getDeclaringClass().getName() + "." +
-                                f.getName() + " of type " +
-                                f.getType().getName() + " in instance of " +
-                                obj.getClass().getName());
+                            // patch by ivy-rew: do not fail on unmatching type!
+                            // throw new ClassCastException(
+                            //     "cannot assign instance of " +
+                            //     val.getClass().getName() + " to field " +
+                            //     f.getDeclaringClass().getName() + "." +
+                            //     f.getName() + " of type " +
+                            //     f.getType().getName() + " in instance of " +
+                            //     obj.getClass().getName());
                         }
                         if (!dryRun)
                             unsafe.putReference(obj, key, val);
